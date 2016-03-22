@@ -1,0 +1,39 @@
+node_modules
+dist
+.tmp
+.sass-cache
+bower_components
+# Eclipse
+.classpath
+.project
+.settings
+
+# Intellij
+.idea
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Brackets
+.brackets.json
+
+# Maven
+log
+target
+
+#AEM
+.vlt
+
+# emacs
+.\#*
+\#*#
+
+# grunt
+node_modules
+.tmp
+.sass-cache
+assets/bower_components
+Gemfile
+prototype
