@@ -1,452 +1,703 @@
-// Generated on 2016-03-22 using
-// generator-webapp 0.5.1
 'use strict';
-
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// If you want to recursively match all subfolders, use:
-// 'test/spec/**/*.js'
 
 module.exports = function(grunt) {
 
-    grunt.loadNpmTasks('assemble');
+  //Load assemble
+  grunt.loadNpmTasks('assemble');
 
+  //Load Handlebars to JST File Compiler
+  grunt.loadNpmTasks('grunt-contrib-handlebars');
 
-    // Time how long tasks take. Can help when optimizing build times
-    require('time-grunt')(grunt);
+  // show elapsed time at the end
+  require('time-grunt')(grunt);
 
+  // project specific custom export for AdobeCQ integration
+  require('./tasks/cms')(grunt);
+  require('./tasks/prototype')(grunt);
 
+  // load all grunt tasks
+  require('load-grunt-tasks')(grunt);
 
-    // Load grunt tasks automatically
-    require('load-grunt-tasks')(grunt);
+  // grunt config
+  grunt.initConfig({
 
-    // Configurable paths
-    var config = {
-        app: 'app',
-        dist: 'dist',
-        tmp: '.tmp'
-    };
+    // configurable paths
+    configs: {
+      app: 'assets',
+      dist: 'dist',
+      prototype: 'prototype',
+      tmp: '.tmp',
+      jsinternal: 'ui/src/main/content/jcr_root/etc/designs/mda/core-design/clientlib-internal',
+      jsexternal: 'ui/src/main/content/jcr_root/etc/designs/mda/core-design/clientlib-external',
+      csscore: 'ui/src/main/content/jcr_root/etc/designs/mda/core-design/clientlib-internal',
+      cssmdaweb: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/clientlib-internal',
+      images: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/images',
+      fonts: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/fonts'
+    },
 
-    // Define the configuration for all the tasks
-    grunt.initConfig({
-
-        // Project settings
-        config: config,
-
-        // Watches files for changes and runs tasks based on the changed files
-        watch: {
-            bower: {
-                files: ['bower.json'],
-                tasks: ['wiredep']
-            },
-            js: {
-                files: ['<%= config.app %>/scripts/{,*/}*.js'],
-                tasks: ['jshint'],
-                options: {
-                    livereload: true
-                }
-            },
-            jstest: {
-                files: ['test/spec/{,*/}*.js'],
-                tasks: ['test:watch']
-            },
-            gruntfile: {
-                files: ['Gruntfile.js']
-            },
-            sass: {
-                files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
-                tasks: ['sass:server', 'autoprefixer']
-            },
-            styles: {
-                files: ['<%= config.app %>/styles/{,*/}*.css'],
-                tasks: ['newer:copy:styles', 'autoprefixer']
-            },
-            livereload: {
-                options: {
-                    livereload: '<%= connect.options.livereload %>'
-                },
-                files: [
-                    '<%= config.app %>/{,*/}*.html',
-                    '<%= config.app %>/templates/{,*/}*.hbs',
-                    '<%= config.app %>/templates/data/*.json',
-                    '.tmp/styles/{,*/}*.css',
-                    '<%= config.app %>/images/{,*/}*'
-                ]
-            }
+    watch: {
+      compass: {
+        files: ['<%= configs.app %>/styles/**/*.scss'],
+        tasks: ['compass:prototype', 'autoprefixer']
+      },
+      styles: {
+        files: ['<%= configs.app %>/styles/**/{,*/}*.css'],
+        tasks: ['autoprefixer']
+      },
+      livereload: {
+        options: {
+          livereload: '<%= connect.options.livereload %>'
         },
+        files: [
+          '<%= configs.app %>/templates/**/*.hbs',
+          '<%= configs.app %>/templates/helpers/*.js',
+          '<%= configs.app %>/templates/data/*.{json,yml}',
+          '{<%= configs.tmp %>,<%= configs.app %>}/styles/{,*/}*.css',
+          '{<%= configs.tmp %>,<%= configs.app %>}/scripts/{,*/}*.js',
+          '{<%= configs.tmp %>,<%= configs.app %>}/scripts/{,*/}*.hbs',
+          '<%= configs.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+        ],
+        tasks: ['handlebars','copy:protoScripts', 'assemble']
+      }
+    },
 
-        // The actual grunt server settings
-        connect: {
-            options: {
-                port: 9000,
-                open: true,
-                livereload: 35729,
-                // Change this to '0.0.0.0' to access the server from outside
-                hostname: 'localhost'
-            },
-            livereload: {
-                options: {
-                    middleware: function(connect) {
-                        return [
-                            connect.static('.tmp'),
-                            connect().use('/bower_components', connect.static('./bower_components')),
-                            connect.static(config.app)
-                        ];
-                    }
-                }
-            },
-            test: {
-                options: {
-                    open: false,
-                    port: 9001,
-                    middleware: function(connect) {
-                        return [
-                            connect.static('.tmp'),
-                            connect.static('test'),
-                            connect().use('/bower_components', connect.static('./bower_components')),
-                            connect.static(config.app)
-                        ];
-                    }
-                }
-            },
-            dist: {
-                options: {
-                    base: '<%= config.dist %>',
-                    livereload: false
-                }
-            }
+    connect: {
+      options: {
+        port: 9000,
+        livereload: 35729,
+        // change this to '0.0.0.0' to access the server from outside
+        hostname: '0.0.0.0'
+      },
+      livereload: {
+        options: {
+          open: true,
+          base: [
+            '<%= configs.tmp %>',
+            '<%= configs.app %>'
+          ]
+        }
+      },
+      dist: {
+        options: {
+          open: true,
+          base: '<%= configs.prototype %>'
+        }
+      }
+    },
+
+    clean: {
+      prototype: {
+        files: [{
+          dot: true,
+          src: [
+            '<%= configs.tmp %>',
+            '<%= configs.prototype %>/*',
+            '!<%= configs.prototype %>/.git*'
+          ]
+        }]
+      },
+      server: '<%= configs.tmp %>',
+      scripts: '<%= configs.tmp %>/scripts/*'
+    },
+
+    jshint: {
+      options: {
+        jshintrc: '.jshintrc'
+      },
+      all: [
+        'Gruntfile.js',
+        '<%= configs.app %>/scripts/{,*/}*.js',
+        '!<%= configs.app %>/scripts/vendor/*'
+      ]
+    },
+
+    compass: {
+      core: {
+        options: {
+          require: ['susy','breakpoint'],
+          sassDir: '<%= configs.app %>/styles',
+          cssDir: '<%= configs.tmp %>/styles',
+          // importPath: '<%= configs.app %>/bower_components',
+          httpImagesPath: '<%= configs.images %>',
+          httpFontsPath: '<%= configs.fonts %>',
+          relativeAssets: false
+        }
+      },
+      prototype: {
+        options: {
+          require: ['susy','breakpoint'],
+          sassDir: '<%= configs.app %>/styles',
+          cssDir: '<%= configs.tmp %>/styles',
+          // importPath: '<%= configs.app %>/bower_components',
+          httpImagesPath: '<%= configs.images %>',
+          httpFontsPath: '<%= configs.fonts %>',
+          relativeAssets: false
+        }
+      }
+    },
+
+    autoprefixer: {
+      options: {
+        browsers: ['last 2 versions']
+      },
+      dist: {
+        files: [{
+          expand: true,
+          cwd: '<%= configs.tmp %>/styles',
+          src: '{,*/}*.css',
+          dest: '<%= configs.tmp %>/styles'
+        }]
+      }
+    },
+
+    useminPrepare: {
+      options: {
+        dest: '<%= configs.prototype %>'
+      },
+      html: '<%= configs.tmp %>/index.html'
+    },
+
+    usemin: {
+      options: {
+        dirs: ['<%= configs.prototype %>']
+      },
+      html: ['<%= configs.prototype %>/{,*/}*.html'],
+      css: ['<%= configs.prototype %>/styles/{,*/}*.css']
+    },
+
+    modernizr: {
+      devFile: '<%= configs.app %>/bower_components/modernizr/modernizr.js',
+      outputFile: '<%= configs.jsexternal %>/modernizr/modernizr.js',
+      uglify: true
+    },
+
+    htmlmin: {
+      dist: {
+        options: {
+          removeCommentsFromCDATA: true,
+          collapseBooleanAttributes: true,
+          removeAttributeQuotes: false,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeOptionalTags: true
         },
-
-        // Empties folders to start fresh
-        clean: {
-            dist: {
-                files: [{
-                    dot: true,
-                    src: [
-                        '.tmp',
-                        '<%= config.dist %>/*',
-                        '!<%= config.dist %>/.git*'
-                    ]
-                }]
-            },
-            server: '.tmp'
+        files: [{
+          expand: true,
+          cwd: '<%= configs.tmp %>',
+          src: '*.html',
+          dest: '<%= configs.prototype %>'
+        }]
+      },
+      deploy: {
+        options: {
+          collapseWhitespace: false
         },
+        files: [{
+          expand: true,
+          cwd: '<%= configs.prototype %>',
+          src: '*.html',
+          dest: '<%= configs.prototype %>'
+        }]
+      }
+    },
 
+    // Put files not handled in other tasks here
+    copy: {
+      ci: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.app %>',
+          dest: '<%= configs.prototype %>',
+          src: [
+            '*.{ico,png,txt}',
+            '.htaccess',
+            'mda-web/**'
+          ]
+        }]
+      },
+      scripts: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.app %>/scripts',
+          dest: '<%= configs.jsinternal %>/js',
+          src: '{,*/}*.js'
+        }]
+        //{
+        //  expand: true,
+        //  dot: true,
+        //  cwd: '<%= configs.app %>',
+        //  dest: '<%= configs.jsexternal %>',
+        //  src: ['bower_components/{,*/}*']
+        //}]
+      },
+      protoScripts: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.app %>/scripts',
+          dest: '<%= configs.tmp %>/scripts/',
+          src: '{,*/}*.js'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.app %>',
+          dest: '<%= configs.tmp %>',
+          src: ['bower_components/**']
+        }]
+      },
+      assets: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.tmp %>/concat/scripts',
+          dest: '<%= configs.prototype %>/scripts',
+          src: '**'
+        },{
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.tmp %>/concat/templates',
+          dest: '<%= configs.prototype %>/templates',
+          src: '**'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '<%= configs.tmp %>/styles',
+          dest: '<%= configs.prototype %>/styles',
+          src: '**'
+        }]
+      },
+      images: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/mda-web/images',
+        dest: '<%= configs.prototype %>/mda-web/images',
+        src: '**'
+      },
+      fonts: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/mda-web/fonts',
+        dest: '<%= configs.prototype %>/mda-web/fonts',
+        src: '**'
+      },
+      crossdomain: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/templates',
+        dest: '<%= configs.tmp %>',
+        src: 'crossdomain.xml'
+      },
+      mdaSkin: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/mda-web/jwplayer',
+        dest: '<%= configs.tmp %>',
+        src: 'mdaSkin.xml'
+      },
+      crossdomainBuild: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/templates',
+        dest: '<%= configs.prototype %>/site',
+        src: 'crossdomain.xml'
+      },
+      mdaSkinBuild: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.app %>/mda-web/jwplayer',
+        dest: '<%= configs.prototype %>/site',
+        src: 'mdaSkin.xml'
+      },
+      htmldist: {
+        expand: true,
+        dot: true,
+        cwd: '<%= configs.tmp %>',
+        dest: '<%= configs.prototype %>',
+        src: '*.html'
+      }
+    },
 
+    concurrent: {
+      server: [
+        'compass'
+      ]
+    },
 
-        // Make sure code styles are up to par and there are no obvious mistakes
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc',
-                reporter: require('jshint-stylish')
-            },
-            all: [
-                'Gruntfile.js',
-                '<%= config.app %>/scripts/{,*/}*.js',
-                '!<%= config.app %>/scripts/vendor/*',
-                'test/spec/{,*/}*.js'
-            ]
-        },
+    assemble: {
+      options: {
+        flatten: true,
+        layoutdir: '<%= configs.app %>/templates/layouts',
+        layout: 'default.hbs',
+        partials: ['<%= configs.app %>/templates/partials/**/*.hbs'],
+        helpers: ['<%= configs.app %>/templates/helpers/*.js'],
+        data: '<%= configs.app %>/templates/data/*.json'
+      },
+      pages: {
+        files: {
+          '<%= configs.tmp %>/': [
+            '<%= configs.app %>/templates/pages/{,*/}*.hbs'
+          ]
+        }
+      }
+    },
 
-        // Mocha testing framework configuration options
-        mocha: {
-            all: {
-                options: {
-                    run: true,
-                    urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
-                }
-            }
-        },
+    bower: {
+      options: {
+        exclude: ['modernizr']
+      }
+    },
 
-        // Compiles Sass to CSS and generates necessary files if requested
-        sass: {
-            options: {
-                loadPath: 'bower_components'
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/styles',
-                    src: ['*.{scss,sass}'],
-                    dest: '.tmp/styles',
-                    ext: '.css'
-                }]
-            },
-            server: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/styles',
-                    src: ['*.{scss,sass}'],
-                    dest: '.tmp/styles',
-                    ext: '.css'
-                }]
-            }
-        },
+    prettify: {
+      options: {},
+      app: {
+        expand: true,
+        cwd: '<%= configs.tmp %>',
+        ext: '.html',
+        src: ['{,*/}*.html'],
+        dest: '<%= configs.tmp %>'
+      },
+      prototype: {
+        expand: true,
+        cwd: '<%= configs.prototype %>/cms',
+        ext: '.html',
+        src: ['{,*/}*.html'],
+        dest: '<%= configs.prototype %>/cms'
+      }
+    },
 
-        // Add vendor prefixed styles
-        autoprefixer: {
-            options: {
-                browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'Opera 12.1']
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/styles/',
-                    src: '{,*/}*.css',
-                    dest: '.tmp/styles/'
-                }]
-            }
-        },
-
-        // Automatically inject Bower components into the HTML file
-        wiredep: {
-            app: {
-                ignorePath: /^\/|\.\.\//,
-                src: ['<%= config.app %>/index.html'],
-                exclude: ['bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js']
-            },
-            sass: {
-                src: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
-                ignorePath: /(\.\.\/){1,2}bower_components\//
-            }
-        },
-
-        // Renames files for browser caching purposes
-        rev: {
-            dist: {
-                files: {
-                    src: [
-                        '<%= config.dist %>/scripts/{,*/}*.js',
-                        '<%= config.dist %>/styles/{,*/}*.css',
-                        '<%= config.dist %>/images/{,*/}*.*',
-                        '<%= config.dist %>/styles/fonts/{,*/}*.*',
-                        '<%= config.dist %>/*.{ico,png}'
-                    ]
-                }
-            }
-        },
-
-        // Reads HTML for usemin blocks to enable smart builds that automatically
-        // concat, minify and revision files. Creates configurations in memory so
-        // additional tasks can operate on them
-        useminPrepare: {
-            options: {
-                dest: '<%= config.dist %>'
-            },
-            html: '<%= config.app %>/index.html'
-        },
-
-        // Performs rewrites based on rev and the useminPrepare configuration
-        usemin: {
-            options: {
-                assetsDirs: [
-                    '<%= config.dist %>',
-                    '<%= config.dist %>/images',
-                    '<%= config.dist %>/styles'
-                ]
-            },
-            html: ['<%= config.dist %>/{,*/}*.html'],
-            css: ['<%= config.dist %>/styles/{,*/}*.css']
-        },
-
-        // The following *-min tasks produce minified files in the dist folder
-        imagemin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.{gif,jpeg,jpg,png}',
-                    dest: '<%= config.dist %>/images'
-                }]
-            }
-        },
-
-        svgmin: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.app %>/images',
-                    src: '{,*/}*.svg',
-                    dest: '<%= config.dist %>/images'
-                }]
-            }
-        },
-        assemble: {
-          options: {
-            'flatten': true,
-            layoutdir: '<%= config.app %>/templates/layouts',
-            partials: ['<%= config.app %>/templates/partials/**/*.hbs'],
-            layout: ['default.hbs'],
-            data: ['<%= config.app %>/templates/data/*.{json,yml}']
-          },
-          pages: {
-            files: {
-              '<%= config.tmp %>' :[
-                '<%= config.app %>/templates/pages/{,*}*.hbs'
-              ]
-            }
+    handlebars: {
+      compile: {
+        options: {
+          namespace: "APP.Templates",
+          processName: function(filePath) {
+            return filePath.replace(/^assets\/scripts\/hbs\//, '').replace(/\.hbs$/, '').replace(/-/g,'_');
           }
         },
+        files: {
+          "<%= configs.app %>/scripts/app.handlebar-templates.js": "<%= configs.app %>/scripts/hbs/*.hbs"
+        }
+      }
+    },
 
-        htmlmin: {
-            dist: {
-                options: {
-                    collapseBooleanAttributes: true,
-                    collapseWhitespace: true,
-                    conservativeCollapse: true,
-                    removeAttributeQuotes: true,
-                    removeCommentsFromCDATA: true,
-                    removeEmptyAttributes: true,
-                    removeOptionalTags: true,
-                    removeRedundantAttributes: true,
-                    useShortDoctype: true
-                },
-                files: [{
-                    expand: true,
-                    cwd: '<%= config.dist %>',
-                    src: '{,*/}*.html',
-                    dest: '<%= config.dist %>'
-                }]
-            }
-        },
+    replace: {
+      images: {
+        src: ['<%= configs.prototype %>/cms/**/*.html'],
+        overwrite: true,
+        replacements: [{
+          from: 'mda-web/images/',
+          to: '../../site/mda-web/images/'
+        }]
+      },
+      fonts: {
+        src: ['<%= configs.prototype %>/site/styles/app.styles.css'],
+        overwrite: true,
+        replacements: [{
+          from: '../../../mda-web/fonts/',
+          to: '../mda-web/fonts/'
+        }]
+      },
+      local: {
+        src: ['<%= configs.prototype %>/site/scripts/app.scripts.js'],
+        overwrite: true,
+        replacements: [{
+          from: 'isLocal: false',
+          to: 'isLocal: true'
+        }]
+      },
+      localbuild: {
+        src: ['<%= configs.prototype %>/site/scripts/app.scripts.js'],
+        overwrite: true,
+        replacements: [{
+          from: 'isLocal: true',
+          to: 'isLocal: false'
+        }]
+      },
+      localImages: {
+        src: ['<%= configs.prototype %>/site/scripts/app.scripts.js'],
+        overwrite: true,
+        replacements: [{
+          from: 'isLocalImages: false',
+          to: 'isLocalImages: true'
+        }]
+      }
+    },
 
-        // By default, your `index.html`'s <!-- Usemin block --> will take care
-        // of minification. These next options are pre-configured if you do not
-        // wish to use the Usemin blocks.
-         cssmin: {
-           dist: {
-             files: {
-               '<%= config.dist %>/styles/main.css': [
-                 '.tmp/styles/{,*/}*.css',
-                 '<%= config.app %>/styles/{,*/}*.css'
-               ]
-             }
-           }
-         },
-         uglify: {
-           dist: {
-             files: {
-               '<%= config.dist %>/scripts/scripts.js': [
-                 '<%= config.dist %>/scripts/scripts.js'
-               ]
-             }
-           }
-         },
-         concat: {
-           dist: {}
-         },
-
-        // Copies remaining files to places other tasks can use
-        copy: {
-            dist: {
-                files: [{
-                    expand: true,
-                    dot: true,
-                    cwd: '<%= config.app %>',
-                    dest: '<%= config.dist %>',
-                    src: [
-                        '*.{ico,png,txt}',
-                        'images/{,*/}*.webp',
-                        '{,*/}*.html',
-                        'styles/fonts/{,*/}*.*'
-                    ]
-                }, {
-                    src: 'node_modules/apache-server-configs/dist/.htaccess',
-                    dest: '<%= config.dist %>/.htaccess'
-                }, {
-                    expand: true,
-                    dot: true,
-                    cwd: '.',
-                    src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
-                    dest: '<%= config.dist %>'
-                }]
-            },
-            styles: {
-                expand: true,
-                dot: true,
-                cwd: '<%= config.app %>/styles',
-                dest: '.tmp/styles/',
-                src: '{,*/}*.css'
-            }
-        },
-
-        // Run some tasks in parallel to speed up build process
-        concurrent: {
-            server: [
-                'sass:server',
-                'copy:styles'
-            ],
-            test: [
-                'copy:styles'
-            ],
-            dist: [
-                'sass',
-                'copy:styles',
-                'imagemin',
-                'svgmin'
+    autoshot: {
+      default_options: {
+        options: {
+          // necessary config
+          path: '<%= configs.tmp %>/screenshots',
+          // optional config, must set either remote or local
+          remote: {
+            files: [
+              { src: "http://0.0.0.0:9000/becoming-our-patient.html", dest: "becoming-our-patient.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/blog-post.html", dest: "blog-post.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/blog.html", dest: "blog.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/breast-cancer-treatment.html", dest: "breast-cancer-treatment.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/breast-cancer.html", dest: "breast-cancer.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/care-center.html", dest: "care-center.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/caregiver.html", dest: "caregiver.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/donate-volunteer.html", dest: "donate-volunteer.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/life-after-cancer.html", dest: "life-after-cancer.png", delay: 1000 },
+              { src: "http://0.0.0.0:9000/patients-family.html", dest: "patients-family.png", delay: 1000 }
             ]
+          },
+          viewport: ['375x600', '768x800', '1440x1080']
+        },
+      },
+    },
+
+    groc: {
+      javascript: [
+        "<%= configs.app %>/scripts/*.js",
+        "<%= configs.app %>/templates/partials/modules/*.hbs",
+        "README.md",
+        "layout-guide.hbs"
+      ],
+      options: {
+        "out": "<%= configs.prototype %>/docs/",
+        "except": "assets/scripts/footable.js"
+      }
+    },
+
+    cms: {
+      build: {
+        dist: "<%= configs.dist %>",
+        tmp: "<%= configs.tmp %>",
+        dest: "<%= configs.dist %>/cms",
+        csscore: "<%= configs.csscore %>",
+        cssmdaweb: "<%= configs.cssmdaweb %>",
+        jsinternal: "<%= configs.jsinternal %>",
+        app: "<%= configs.app %>",
+        mainCSS: "app.styles.css",
+        mainJS: "app.main.js",
+        globals: {
+          scss: {
+            dir: [
+              '<%= configs.app %>/styles/'
+            ],
+            styles: [
+              '<%= configs.app %>/assets/styles/globals/'
+            ]
+          }
         }
-    });
+      }
+    },
 
+    prototypeBuild: {
+      build: {
+        dist: "<%= configs.prototype %>",
+        dest: "<%= configs.prototype %>/cms",
+        templates: "<%= configs.app %>/templates",
+        app: "<%= configs.app %>",
+        tmp: "<%= configs.tmp %>",
+        mainCSS: "app.styles.css",
+        mainJS: "app.main.js",
+        module: {
+          dirs: {
+            markup: '<%= configs.app %>/templates/partials/modules/',
+            scripts: '<%= configs.app %>/scripts/'
+          },
+          layout: '<%= configs.app %>/templates/layouts/cms.hbs',
+          preview: '<%= configs.app %>/templates/layouts/cms-preview.hbs',
+          data: {
+            "accordion": "modules_accordion.breast-cancer-1",
+            // "account-bar": "modules_",
+            // "alerts": "modules_",
+            // "anchor-links": "modules_",
+            "appointment-bar": "modules_layout.appointment-bar",
+            "article-blog": "modules_article_blog.blog-post-1",
+            // "badge": "modules_",
+            "basic-content-media": "modules_basic_content_media.patients-family-1",
+            "basic-content": "modules_basic_content.breast-cancer-1",
+            // "bio-preview": "modules_",
+            // "bio": "modules_",
+            "clinical-trials-header": "clinical_trials.clinical-trials-detail-header",
+            "page-header": "publications.publication-issue-header",
+            "blog-search-filter": "modules_layout.blog-search-filter",
+            "blog-summary": "modules_blog_summary.blog-1",
+            "carousel-hero": "modules_carousel.patients-family-hero",
+            "carousel": "modules_carousel.patients-family-1",
+            "collection": "modules_collection.patients-family-1",
+            "comments": "modules_layout.comments",
+            // "donate": "modules_",
+            // "drill-down-list": "modules_",
+            "events": "modules_events.event-1.data",
+            // "explicit-personalization-module": "modules_",
+            "faculty-listing": "modules_carousel.faculty-listing",
+            "flip-hero": "modules_hero.donate-volunteer",
+            // "footer": "modules_",
+            // "form-elements": "modules_",
+            "glossary": "modules_glossary.glossary-example-01",
+            // "header": "modules_",
+            "headline": "modules_headline.donate-volunteer-1",
+            "link-list": [
+              "modules_link_list.patients-family-1",
+              "modules_link_list.blog-1"
+            ],
+            "media-player": "modules_media_player.care-center",
+            // "navigation": "modules_",
+            "newsfeed": "modules_link_list.blog-1",
+            // "overlay": "modules_",
+            // "pre-footer": "modules_",
+            "promos": "modules_promo.breast-cancer-1",
+            "search-block": "modules_search_block.patients-family-1",
+            // "section-callout": "modules_",
+            "sentence-filter": "modules_layout.sentence-filter",
+            // "share": "modules_",
+            // "sidebar": "modules_",
+            "sitemap-accordion": "modules_sitemap_accordion.patients-family-1",
+            "stand-alone-quote": "modules_stand_alone_quote.becoming-our-patient-1",
+            "static-hero": "modules_hero.becoming-our-patient",
+            "subnavigation": "data_navigation.subnav-data",
+            // "tabs": "modules_",
+            "teaser": "modules_teaser.care-center-1",
+            "video-carousel": "video_carousel.video-carousel-1",
+            // "tophat": "modules_",
+            // "video": "modules_",
+            "search-filter": "search-results.search-results-filters-1",
+            "search-suggested-content": "search-results.suggestedResults",
+            "search-result": "search-results.allResults",
+            "publication-subscribe": "publications.publications-1",
+            "social-feed": "social_feed.social-feed-example",
+            "resource-collection": [
+              "resource_center.resource-collections-patient-ed",
+              "resource_center.resource-collections-podcasts",
+              "resource_center.resource-collections-news-releases"
+            ]
+          }
+        },
+        globals: {
+          scss: {
+            dir: [
+              '<%= configs.app %>/styles/'
+            ],
+            styles: [
+              '<%= configs.app %>/styles/globals/'
+            ]
+          },
+          scripts: {
+            concat: {
+              libs: [
+                "<%= configs.app %>/bower_components/jquery/dist/jquery.js",
+                "<%= configs.app %>/bower_components/modernizr/modernizr.js"
+              ],
+              main: [
+                "<%= configs.app %>/scripts/app.main.js",
+                "<%= configs.app %>/scripts/app.global-carousel.js",
+                "<%= configs.app %>/scripts/app.tabs.js",
+                "<%= configs.app %>/scripts/app.modal.js",
+                "<%= configs.app %>/scripts/app.search.js",
+                "<%= configs.app %>/scripts/app.scroll-transitions.js",
+                "<%= configs.app %>/scripts/app.video.js"
+              ]
+            },
+            modules: [
 
-    grunt.registerTask('serve', 'start the server and preview your app, --allow-remote for remote access', function(target) {
-        if (grunt.option('allow-remote')) {
-            grunt.config.set('connect.options.hostname', '0.0.0.0');
+            ]
+          },
+          images: '<%= configs.app %>/mda-web/images/',
+          fonts: '<%= configs.app %>/mda-web/fonts/'
         }
-        if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
-        }
+      }
+    }
 
-        grunt.task.run([
-            'clean:server',
-            'assemble',
-            'wiredep',
-            'concurrent:server',
-            'autoprefixer',
-            'connect:livereload',
-            'watch'
-        ]);
-    });
+  });
 
-    grunt.registerTask('server', function(target) {
-        grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-        grunt.task.run([target ? ('serve:' + target) : 'serve']);
-    });
+  grunt.registerTask('serve', function(target) {
+    if (target === 'dist') return grunt.task.run(['build', 'connect:dist:keepalive']);
 
-    grunt.registerTask('test', function(target) {
-        if (target !== 'watch') {
-            grunt.task.run([
-                'clean:server',
-                'concurrent:test',
-                'autoprefixer'
-            ]);
-        }
-
-        grunt.task.run([
-            'connect:test',
-            'mocha'
-        ]);
-    });
-
-    grunt.registerTask('build', [
-        'clean:dist',
-        'wiredep',
-        'useminPrepare',
-        'concurrent:dist',
-        'autoprefixer',
-        'concat',
-        'cssmin',
-        'uglify',
-        'copy:dist',
-        'rev',
-        'usemin',
-        'htmlmin'
+    grunt.task.run([
+      'clean:server',
+      'assemble',
+      'handlebars',
+      'concurrent:',
+      'autoprefixer',
+      'copy:protoScripts',
+      'copy:crossdomain',
+      'copy:mdaSkin',
+      'connect:livereload',
+      'watch'
     ]);
+  });
 
-    grunt.registerTask('default', [
-        'newer:jshint',
-        'test',
-        'build'
-    ]);
+  grunt.registerTask('test', [
+    'concurrent:test',
+    'autoprefixer',
+    'connect:test',
+    'mocha'
+  ]);
+
+  grunt.registerTask('build', [
+    'compass:core',
+    'handlebars',
+    'autoprefixer',
+    'copy:scripts',
+    'replace:localbuild',
+    'cms'
+  ]);
+
+  grunt.registerTask('default', [
+    'jshint',
+    'test',
+    'build'
+  ]);
+
+  grunt.registerTask('prototype', [
+    'clean:prototype',
+    'assemble',
+    'handlebars',
+    'useminPrepare',
+    'concurrent:server',
+    // 'htmlmin:dist',
+    'copy:htmldist',
+    'autoprefixer',
+    'copy:images',
+    'copy:fonts',
+    'copy:protoScripts',
+    'concat',
+    'copy:ci',
+    'usemin',
+    'copy:assets',
+    'prototypeBuild',
+    'replace:images',
+    'replace:fonts',
+    'replace:local',
+    'replace:localImages',
+    // 'prettify:prototype',
+    'copy:crossdomainBuild',
+    'copy:mdaSkinBuild',
+    'groc'
+  ]);
+
+  grunt.registerTask('qabuild', [
+    'clean:prototype',
+    'assemble',
+    'handlebars',
+    'useminPrepare',
+    'concurrent:server',
+    // 'htmlmin:dist',
+    'copy:htmldist',
+    'autoprefixer',
+    'copy:images',
+    'copy:fonts',
+    'copy:protoScripts',
+    'concat',
+    'copy:ci',
+    'usemin',
+    'copy:assets',
+    'prototypeBuild',
+    'replace:images',
+    'replace:fonts',
+    'replace:localbuild',
+    'replace:localImages',
+    // 'prettify:prototype',
+    'copy:crossdomainBuild',
+    'copy:mdaSkinBuild',
+    'groc'
+  ]);
 };
+
