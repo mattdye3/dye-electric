@@ -11,9 +11,7 @@ module.exports = function(grunt) {
   // show elapsed time at the end
   require('time-grunt')(grunt);
 
-  // project specific custom export for AdobeCQ integration
-  require('./tasks/cms')(grunt);
-  require('./tasks/prototype')(grunt);
+  
 
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
@@ -23,7 +21,7 @@ module.exports = function(grunt) {
 
     // configurable paths
     configs: {
-      app: 'assets',
+      app: 'app',
       dist: 'dist',
       prototype: 'prototype',
       tmp: '.tmp',
@@ -125,7 +123,7 @@ module.exports = function(grunt) {
       },
       prototype: {
         options: {
-          require: ['susy','breakpoint'],
+          require: ['breakpoint'],
           sassDir: '<%= configs.app %>/styles',
           cssDir: '<%= configs.tmp %>/styles',
           // importPath: '<%= configs.app %>/bower_components',
@@ -448,162 +446,9 @@ module.exports = function(grunt) {
           viewport: ['375x600', '768x800', '1440x1080']
         },
       },
-    },
-
-    groc: {
-      javascript: [
-        "<%= configs.app %>/scripts/*.js",
-        "<%= configs.app %>/templates/partials/modules/*.hbs",
-        "README.md",
-        "layout-guide.hbs"
-      ],
-      options: {
-        "out": "<%= configs.prototype %>/docs/",
-        "except": "assets/scripts/footable.js"
-      }
-    },
-
-    cms: {
-      build: {
-        dist: "<%= configs.dist %>",
-        tmp: "<%= configs.tmp %>",
-        dest: "<%= configs.dist %>/cms",
-        csscore: "<%= configs.csscore %>",
-        cssmdaweb: "<%= configs.cssmdaweb %>",
-        jsinternal: "<%= configs.jsinternal %>",
-        app: "<%= configs.app %>",
-        mainCSS: "app.styles.css",
-        mainJS: "app.main.js",
-        globals: {
-          scss: {
-            dir: [
-              '<%= configs.app %>/styles/'
-            ],
-            styles: [
-              '<%= configs.app %>/assets/styles/globals/'
-            ]
-          }
-        }
-      }
-    },
-
-    prototypeBuild: {
-      build: {
-        dist: "<%= configs.prototype %>",
-        dest: "<%= configs.prototype %>/cms",
-        templates: "<%= configs.app %>/templates",
-        app: "<%= configs.app %>",
-        tmp: "<%= configs.tmp %>",
-        mainCSS: "app.styles.css",
-        mainJS: "app.main.js",
-        module: {
-          dirs: {
-            markup: '<%= configs.app %>/templates/partials/modules/',
-            scripts: '<%= configs.app %>/scripts/'
-          },
-          layout: '<%= configs.app %>/templates/layouts/cms.hbs',
-          preview: '<%= configs.app %>/templates/layouts/cms-preview.hbs',
-          data: {
-            "accordion": "modules_accordion.breast-cancer-1",
-            // "account-bar": "modules_",
-            // "alerts": "modules_",
-            // "anchor-links": "modules_",
-            "appointment-bar": "modules_layout.appointment-bar",
-            "article-blog": "modules_article_blog.blog-post-1",
-            // "badge": "modules_",
-            "basic-content-media": "modules_basic_content_media.patients-family-1",
-            "basic-content": "modules_basic_content.breast-cancer-1",
-            // "bio-preview": "modules_",
-            // "bio": "modules_",
-            "clinical-trials-header": "clinical_trials.clinical-trials-detail-header",
-            "page-header": "publications.publication-issue-header",
-            "blog-search-filter": "modules_layout.blog-search-filter",
-            "blog-summary": "modules_blog_summary.blog-1",
-            "carousel-hero": "modules_carousel.patients-family-hero",
-            "carousel": "modules_carousel.patients-family-1",
-            "collection": "modules_collection.patients-family-1",
-            "comments": "modules_layout.comments",
-            // "donate": "modules_",
-            // "drill-down-list": "modules_",
-            "events": "modules_events.event-1.data",
-            // "explicit-personalization-module": "modules_",
-            "faculty-listing": "modules_carousel.faculty-listing",
-            "flip-hero": "modules_hero.donate-volunteer",
-            // "footer": "modules_",
-            // "form-elements": "modules_",
-            "glossary": "modules_glossary.glossary-example-01",
-            // "header": "modules_",
-            "headline": "modules_headline.donate-volunteer-1",
-            "link-list": [
-              "modules_link_list.patients-family-1",
-              "modules_link_list.blog-1"
-            ],
-            "media-player": "modules_media_player.care-center",
-            // "navigation": "modules_",
-            "newsfeed": "modules_link_list.blog-1",
-            // "overlay": "modules_",
-            // "pre-footer": "modules_",
-            "promos": "modules_promo.breast-cancer-1",
-            "search-block": "modules_search_block.patients-family-1",
-            // "section-callout": "modules_",
-            "sentence-filter": "modules_layout.sentence-filter",
-            // "share": "modules_",
-            // "sidebar": "modules_",
-            "sitemap-accordion": "modules_sitemap_accordion.patients-family-1",
-            "stand-alone-quote": "modules_stand_alone_quote.becoming-our-patient-1",
-            "static-hero": "modules_hero.becoming-our-patient",
-            "subnavigation": "data_navigation.subnav-data",
-            // "tabs": "modules_",
-            "teaser": "modules_teaser.care-center-1",
-            "video-carousel": "video_carousel.video-carousel-1",
-            // "tophat": "modules_",
-            // "video": "modules_",
-            "search-filter": "search-results.search-results-filters-1",
-            "search-suggested-content": "search-results.suggestedResults",
-            "search-result": "search-results.allResults",
-            "publication-subscribe": "publications.publications-1",
-            "social-feed": "social_feed.social-feed-example",
-            "resource-collection": [
-              "resource_center.resource-collections-patient-ed",
-              "resource_center.resource-collections-podcasts",
-              "resource_center.resource-collections-news-releases"
-            ]
-          }
-        },
-        globals: {
-          scss: {
-            dir: [
-              '<%= configs.app %>/styles/'
-            ],
-            styles: [
-              '<%= configs.app %>/styles/globals/'
-            ]
-          },
-          scripts: {
-            concat: {
-              libs: [
-                "<%= configs.app %>/bower_components/jquery/dist/jquery.js",
-                "<%= configs.app %>/bower_components/modernizr/modernizr.js"
-              ],
-              main: [
-                "<%= configs.app %>/scripts/app.main.js",
-                "<%= configs.app %>/scripts/app.global-carousel.js",
-                "<%= configs.app %>/scripts/app.tabs.js",
-                "<%= configs.app %>/scripts/app.modal.js",
-                "<%= configs.app %>/scripts/app.search.js",
-                "<%= configs.app %>/scripts/app.scroll-transitions.js",
-                "<%= configs.app %>/scripts/app.video.js"
-              ]
-            },
-            modules: [
-
-            ]
-          },
-          images: '<%= configs.app %>/mda-web/images/',
-          fonts: '<%= configs.app %>/mda-web/fonts/'
-        }
-      }
     }
+
+    
 
   });
 
@@ -624,20 +469,13 @@ module.exports = function(grunt) {
     ]);
   });
 
-  grunt.registerTask('test', [
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'mocha'
-  ]);
+ 
 
   grunt.registerTask('build', [
     'compass:core',
     'handlebars',
     'autoprefixer',
-    'copy:scripts',
-    'replace:localbuild',
-    'cms'
+    'copy:scripts'
   ]);
 
   grunt.registerTask('default', [
@@ -646,58 +484,6 @@ module.exports = function(grunt) {
     'build'
   ]);
 
-  grunt.registerTask('prototype', [
-    'clean:prototype',
-    'assemble',
-    'handlebars',
-    'useminPrepare',
-    'concurrent:server',
-    // 'htmlmin:dist',
-    'copy:htmldist',
-    'autoprefixer',
-    'copy:images',
-    'copy:fonts',
-    'copy:protoScripts',
-    'concat',
-    'copy:ci',
-    'usemin',
-    'copy:assets',
-    'prototypeBuild',
-    'replace:images',
-    'replace:fonts',
-    'replace:local',
-    'replace:localImages',
-    // 'prettify:prototype',
-    'copy:crossdomainBuild',
-    'copy:mdaSkinBuild',
-    'groc'
-  ]);
 
-  grunt.registerTask('qabuild', [
-    'clean:prototype',
-    'assemble',
-    'handlebars',
-    'useminPrepare',
-    'concurrent:server',
-    // 'htmlmin:dist',
-    'copy:htmldist',
-    'autoprefixer',
-    'copy:images',
-    'copy:fonts',
-    'copy:protoScripts',
-    'concat',
-    'copy:ci',
-    'usemin',
-    'copy:assets',
-    'prototypeBuild',
-    'replace:images',
-    'replace:fonts',
-    'replace:localbuild',
-    'replace:localImages',
-    // 'prettify:prototype',
-    'copy:crossdomainBuild',
-    'copy:mdaSkinBuild',
-    'groc'
-  ]);
 };
 
