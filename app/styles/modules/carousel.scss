@@ -1,0 +1,30 @@
+.carousel{
+	padding: 30px 60px;
+	.carousel-item{
+		margin: 0 30px;
+		img{
+			height: 400px;
+		}
+		p{
+			text-align: center;
+		}
+
+	}
+
+	.slick-next{
+		right: 25px;
+		&:before{
+			color: black;
+			font-family: "FontAwesome";
+			content: '\f061';
+		}
+	}
+	.slick-prev{
+		left: 25px;
+		&:before{
+			color: black;
+			font-family: "FontAwesome";
+			content: '\f060';
+		}
+	}
+}

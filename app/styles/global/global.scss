@@ -1,0 +1,27 @@
+body{
+	margin: 0;
+	padding: 0;
+}
+
+html {
+  box-sizing: border-box;
+  display: block;
+  overflow-x: hidden;
+}
+
+html,body{
+	height: 100%;
+	width: 100%;
+}
+
+a,h1{
+	font-family: 'Open Sans', sans-serif;
+}
+
+p,span{
+	font-family: 'Roboto', sans-serif;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}

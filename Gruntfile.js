@@ -29,7 +29,7 @@ module.exports = function(grunt) {
       jsexternal: 'ui/src/main/content/jcr_root/etc/designs/mda/core-design/clientlib-external',
       csscore: 'ui/src/main/content/jcr_root/etc/designs/mda/core-design/clientlib-internal',
       cssmdaweb: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/clientlib-internal',
-      images: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/images',
+      images: '/images',
       fonts: 'ui/src/main/content/jcr_root/etc/designs/mda/mda-web/fonts'
     },
 

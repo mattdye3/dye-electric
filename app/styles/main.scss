@@ -1,2 +1,22 @@
-//Global Elements
-@import 'global/header.scss'
+//Fonts
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+//Base
+@import 'base/_site-settings.scss';
+
+//3rd Party
+@import 'global/slick.scss';
+@import 'global/slick-theme.scss';
+
+
+//Global
+@import 'global/mixins.scss';
+@import 'global/global.scss';
+
+
+//Modules Elements
+@import 'modules/header.scss';
+@import 'modules/title-component.scss';
+@import 'modules/footer.scss';
+@import 'modules/carousel.scss';

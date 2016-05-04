@@ -1,0 +1,23 @@
+{
+	"home" : {
+		"carousel-items" : [
+			{
+				"img" : "images/1.jpg",
+				"description" : "This is an awesome description"
+			},
+			{
+				"img" : "images/2.jpg",
+				"description" : "This is an awesome description 2"
+			},
+			{
+				"img" : "images/3.jpg",
+				"description" : "This is an awesome description 3"
+			},
+			{
+				"img" : "images/4.jpg",
+				"description" : "This is an awesome description 4"
+			}
+
+		]
+	}
+}
