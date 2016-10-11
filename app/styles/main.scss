@@ -8,6 +8,7 @@
 //3rd Party
 @import 'global/slick.scss';
 @import 'global/slick-theme.scss';
+@import 'lib/_breakpoint.scss';
 
 
 //Global
@@ -20,3 +21,6 @@
 @import 'modules/title-component.scss';
 @import 'modules/footer.scss';
 @import 'modules/carousel.scss';
+@import 'modules/home-body.scss';
+
+

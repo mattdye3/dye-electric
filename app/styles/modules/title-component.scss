@@ -15,4 +15,8 @@
 		}
 	}
 
+	@include breakpoint(max-width $width-medium) {
+   		height: 60px;
+	}
+
 }
